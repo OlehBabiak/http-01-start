@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
+import {map} from 'rxjs/operators';
+import {PostModel} from './models/post.model';
 
 @Component({
   selector: 'app-root',
@@ -7,18 +9,19 @@ import {HttpClient} from '@angular/common/http';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  loadedPosts = [];
+  loadedPosts: PostModel[] = [];
 
   constructor(private http: HttpClient) {
   }
 
   ngOnInit() {
+    this.fetchPosts();
   }
 
-  onCreatePost(postData: { title: string; content: string }) {
+  onCreatePost(postData: PostModel) {
     // Send Http request
     this.http
-      .post('http://localhost:8090/api/posts', postData)
+      .post<{ message: string }>('http://localhost:8090/api/posts', postData)
       .subscribe(res => {
         console.log(res);
       })
@@ -27,9 +30,21 @@ export class AppComponent implements OnInit {
 
   onFetchPosts() {
     // Send Http request
+    this.fetchPosts();
   }
 
   onClearPosts() {
     // Send Http request
+  }
+
+  private fetchPosts() {
+    this.http
+      .get('http://localhost:8090/api/posts')
+      .pipe(map((res: {posts: PostModel[]}) => {
+        return res.posts;
+      }))
+      .subscribe(posts => {
+        this.loadedPosts = posts;
+      });
   }
 }
