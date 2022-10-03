@@ -40,7 +40,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.postService.deletePosts()
       .subscribe(res => {
         this.loadedPosts = []
-        console.log(res)
+        // console.log(res)
       });
   }
 
@@ -55,10 +55,14 @@ export class AppComponent implements OnInit, OnDestroy {
         this.isFetching = false;
         this.loadedPosts = posts
       }, error => {
+        this.isFetching = false;
         this.error = error.statusText + ` 404`
         console.log(error)
       }
     )
   }
 
+  onHandleError() {
+    this.error = null;
+  }
 }
